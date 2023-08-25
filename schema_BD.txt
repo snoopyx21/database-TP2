@@ -1,0 +1,59 @@
+select object_name,owner from all_objects where object_name like 'L2I%';
+
+OBJECT_NAME		       OWNER
+------------------------------ ------------------------------
+L2I_CIRCUIT		       PUBLIC
+L2I_CIRETAPE		       PUBLIC
+L2I_CIRPROG		       PUBLIC
+L2I_MONUMENT		       PUBLIC
+L2I_RESER		       PUBLIC
+L2I_VILLE		       PUBLIC
+
+SQL> desc L2I_CIRCUIT
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NC						    NUMBER
+ VDEP						    VARCHAR2(20)
+ VARR						    VARCHAR2(20)
+ PRIX						    NUMBER
+
+SQL> desc L2I_CIRETAPE
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NC						    NUMBER
+ RANG						    NUMBER
+ VILET						    VARCHAR2(20)
+ NBJ						    NUMBER
+
+SQL> desc L2I_CIRPROG
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NC						    NUMBER
+ DATEDEP					    DATE
+ NBLIBR 					    NUMBER
+
+SQL> desc L2I_MONUMENT
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NOMM						    VARCHAR2(30)
+ NOMV						    VARCHAR2(20)
+ PRIX						    NUMBER
+
+SQL> desc L2I_RESER
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NR						    NUMBER
+ NOMC						    VARCHAR2(20)
+ NC						    NUMBER
+ DATEDEP					    DATE
+ NBRES						    NUMBER
+
+SQL> desc L2I_VILLE
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ NOMV						    VARCHAR2(20)
+ PAYS						    VARCHAR2(20)
+
+
+
+

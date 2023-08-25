@@ -1,0 +1,286 @@
+﻿TP 2 : SQL sur les bases de données « Agence de voyages »
+
+
+I. Ecrire les requêtes suivantes sous forme de jointures ou de requêtes imbriquées
+
+/*1*/
+
+SQL> select vilet from L2I_ciretape c, L2I_reser r where c.nc=r.nc and nomc='GrosseBaf';
+
+OU
+
+SQL> select vilet from L2I_CIRETAPE where nc in (select nc from L2I_reser where upper(nomc)='GROSSEBAF');
+
+VILET
+------------------------------------------------------------
+Amsterdam
+
+
+/*2*/
+
+SQL> select distinct nc from L2I_ciretape c, L2I_ville v where c.vilet=v.nomv and pays='Irlande';
+
+OU
+
+SQL> select distinct nc from L2I_ciretape where vilet in (select nomv from L2I_ville where pays='Irlande');
+
+	NC
+----------
+	10
+
+
+/*3*/
+
+SQL> select nomv from L2I_monument group by nomv having count(nomm)>1;
+
+OU 
+
+SQL> select distinct m1.nomv from L2I_monument m1, L2I_monument m2 
+  2  where m1.nomv=m2.nomv and m1.nomm <> m2.nomm;
+
+NOMV
+------------------------------------------------------------
+Venise
+Londres
+Amsterdam
+Port Cotton
+
+
+
+/*4*/
+
+SQL> select nc, vdep, varr from L2I_circuit
+  2  where nc in
+  3  (select nc from L2I_cirprog where to_char(datedep, 'YYYY/MM/DD')>'2006/04/17' and nblibr>10);
+
+	NC VDEP
+---------- ------------------------------------------------------------
+VARR
+------------------------------------------------------------
+	 2 Paris
+Paris
+
+	 3 Paris
+Paris
+
+	 4 Paris
+Paris
+
+
+	NC VDEP
+---------- ------------------------------------------------------------
+VARR
+------------------------------------------------------------
+	 5 Lyon
+Lyon
+
+	 8 Clermont Ferrand
+Besse
+
+	10 Shannon
+Cork
+
+
+	NC VDEP
+---------- ------------------------------------------------------------
+VARR
+------------------------------------------------------------
+	 6 Paris
+Paris
+
+	 7 Quiberon
+Hoedic
+
+
+8 rows selected.
+
+
+/*5*/
+
+
+SQL> select m.nomm
+  2  from L2I_monument m, L2I_ciretape c
+  3  where m.nomv=c.vilet and c.nc in (select nc from L2I_reser where upper(nomc)='ASTERIX');
+
+NOMM
+--------------------------------------------------------------------------------
+Canals
+medical Center
+Madurodam
+
+
+/*6*/
+
+SQL> select nc, datedep from L2I_cirprog where nc in (select nc from L2I_ciretape where vilet in (select nomv from L2I_ville where pays = 'Angleterre'));
+
+OU 
+
+SQL> select distinct c1.nc, c1.datedep from L2I_cirprog c1, L2I_ciretape c2, L2I_ville v where v.pays='Angleterre' and v.nomv=c2.vilet and c2.nc=c1.nc;
+
+	NC DATEDEP
+---------- ---------------
+	 2 17-MAR-06
+	 2 17-APR-04
+	 2 16-APR-06
+	 3 11-SEP-06
+	 3 04-MAR-06
+	 2 18-MAR-06
+	 3 11-MAR-06
+	 2 14-NOV-06
+
+8 rows selected.
+
+/*7*/
+SQL> select c.nc, nomc from L2I_circuit c left join L2I_reser r on c.nc=r.nc order by nc;
+
+SQL> select nc, nomc from L2I_circuit natural left join L2I_reser order by nc;
+
+	NC NOMC
+---------- ------------------------------------------------------------
+	 1 Picsou
+	 1 Asterix
+	 2 Nestor Burma
+	 2 Milou
+	 3 Jerry
+	 4 GrosseBaf
+	 5 Ordralphabetix
+	 5 Mafalda
+	 6
+	 7 Donald
+	 8 La Castafiore
+
+	NC NOMC
+---------- ------------------------------------------------------------
+	 8 Picsou
+	 8 Milou
+	 9 Picsou
+	10 Ordralphabetix
+	10 Donald
+
+16 rows selected.
+
+SQL> select c.nc, nomc from L2I_circuit c left outer join L2I_reser r on c.nc=r.nc order by nc;
+
+
+II. Ecrire les requêtes suivantes en utilisant les fonctions 
+d’agrégation (GROUP BY)
+
+/*1*/ 
+
+SQL> select count(distinct nomm) "Nombre de monuments" from L2I_ville v, L2I_monument m where v.pays='France' and v.nomv=m.nomv;
+
+Nombre de monuments
+-------------------
+		  3
+
+/*2*/
+
+SQL> select avg(prix) "prix moyen" from L2I_circuit;
+
+prix moyen
+----------
+       264
+
+/*3*/
+
+SQL> select nomc, sum(nbres) as "Nombres de places" from L2I_reser group by nomc;
+
+NOMC							     Nombres de places
+------------------------------------------------------------ -----------------
+La Castafiore								     7
+Donald									    53
+GrosseBaf								    88
+Asterix 								     4
+Jerry									    11
+Ordralphabetix								     4
+Milou									   100
+Picsou									    21
+Mafalda 								    43
+Nestor Burma								    25
+
+10 rows selected.
+/*4*/
+
+SQL> select nc from L2I_circuit where prix=(select max(prix) from L2I_circuit);
+
+	NC
+----------
+	10
+
+/*5*/
+
+SQL> select nomv from L2I_monument group by nomv having count(nomm)>1;
+
+NOMV
+------------------------------------------------------------
+Venise
+Londres
+Amsterdam
+Port Cotton
+
+/*6*/
+
+SQL> select sum(count(nomm)) as "Nombre de monuments" from L2I_monument group by nomv having nomv in 
+	(select vilet from L2I_ciretape c, L2I_reser r where c.nc=r.nc and r.nomc='Donald');
+
+Nombre de monuments
+-------------------
+		  3
+
+/*7*/
+
+SQL> select nomv as "Ville", count(nomm) as "Nb de monuments" from L2I_monument group by nomv having nomv in 
+	(select vilet from L2I_ciretape c, L2I_reser r where c.nc=r.nc and r.nomc='Donald');
+
+Ville							     Nb de monuments
+------------------------------------------------------------ ---------------
+Port Maria								   1
+Port Cotton								   2
+
+/*8*/
+
+NOMC							     SUM(PRIX*NBRES)
+------------------------------------------------------------ ---------------
+La Castafiore								1498
+Donald								       13984
+GrosseBaf							       11176
+Asterix 								 464
+Jerry									1144
+Ordralphabetix								1782
+Milou								       11698
+Picsou									7074
+Mafalda 							       11782
+Nestor Burma								2900
+
+
+/*9*/
+
+SQL> select max(sum(prix*nbres)) from L2I_reser r, L2I_circuit c where r.nc=c.nc group by nomc;
+
+MAX(SUM(PRIX*NBRES))
+--------------------
+	       13984
+
+/*10*/
+
+SQL> select nomc, sum(nbres*prix) as "Montant total" from L2I_reser r, L2I_circuit c where r.nc=c.nc group by nomc having sum(nbres*prix)=(select max(sum(nbres*prix)) from L2I_circuit c, L2I_reser r where r.nc=c.nc group by nomc);
+
+NOMC							     Montant total
+------------------------------------------------------------ -------------
+Donald								     13984
+
+/*11*/
+
+SQL> select nomc, count(nomm) from L2I_monument m, L2I_ciretape c, L2I_reser r where m.nomv=c.vilet and c.nc=r.nc group by nomc;
+
+NOMC							     COUNT(NOMM)
+------------------------------------------------------------ -----------
+GrosseBaf							       3
+Donald								       3
+Asterix 							       3
+Jerry								       5
+Ordralphabetix						       6
+Milou								      13
+Mafalda 							       6
+Picsou								       3
+Nestor Burma							      13
